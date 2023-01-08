@@ -28,6 +28,16 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "에드피아에서 카메라에 접근하는 것을 허용해주세요",
+          "savePhotosPermission": "에드피아에서 사진을 저장하는 것을 허용해주세요",
+          "isAccessMediaLocationEnabled": true
+        }
+      ]
+    ]
   }
 }
