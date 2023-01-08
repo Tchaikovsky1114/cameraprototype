@@ -62,6 +62,7 @@ const CategoryDetailScreen = ({route}) => {
         <ScrollView
           contentContainerStyle={{backgroundColor:'#fff',justifyContent:'center',alignItems:'center'}}
           showsVerticalScrollIndicator={false}
+          
           >
         {button.optionQuantity.map((item) => 
           <Pressable
