@@ -31,7 +31,8 @@ const CategoryDetailScreen = ({route}) => {
   const [removebgPicture,setRemovebgPicture] = useRecoilState(removebgPictureState);
   const [nowStep,setNowStep] = useState(0);
   const [totalStep,setTotalstep] = useState(0);
-
+  // pending,fulfilled,loading
+  const [removebgStatus,setRemovebgStatus] = useState('pending')
   const getGrantCameraPermissionHandler = async () => {
     try {
       const { status } = await Camera.requestCameraPermissionsAsync(); 
@@ -72,10 +73,9 @@ const CategoryDetailScreen = ({route}) => {
   },[])
   
   const removeBackgroundHandler = () => {
-    // console.log(picture);
-    // console.log(removebgPicture);
-    // console.log(picture.base64);
+    
     try {
+      // removal.ai
     const formData = new FormData()
     formData.append('image_url',picture.base64);
       const xhr = new XMLHttpRequest();
@@ -86,34 +86,32 @@ const CategoryDetailScreen = ({route}) => {
           setRemovebgPicture(JSON.parse(this.responseText));
         }
       })
-
-      // xhr.onload = () => {
-      //   console.log(`${xhr.status} ${xhr.response}`)
-      // }
-      // xhr.onprogress = (e) => {
-      //   console.log(`Downloaded ${e.loaded} of ${e.total} bytes`)
-      // }
-      
+      xhr.onprogress = (e) => {
+        console.log(`Downloaded ${e.loaded} of ${e.total} bytes`)
+        setRemovebgStatus('fulfilled')
+      }
       xhr.upload.onload = () => {
         console.log(`upload is completed: ${xhr.status} ${xhr.response}`)
       }
       xhr.upload.onprogress = (e) => {
         console.log(`uploaded ${e.loaded} of ${e.total}`);
+        setRemovebgStatus('loading');
         setNowStep(e.loaded);
         setTotalstep(e.total);
       }
       xhr.upload.onloadend = (e) => {
-        console.log(`업로드 완료 후 파일을 다운로드 중입니다`)
+        console.log(`업로드 완료 후 파일을 다운로드 중입니다`); 
       }
       xhr.open("POST","https://api.removal.ai/3.0/remove");
-      xhr.setRequestHeader("Rm-token","63b95a44603016.39743985")
+      xhr.setRequestHeader("Rm-token","63baa122cab1e9.57184986")
       xhr.send(formData);
 
+
     } catch (error) {
-      console.error(error);
+      console.error(error.response.data);
     }
   }
-  
+  console.log(picture.base64)
   useLayoutEffect(() => { 
     navigation.setOptions({
       title: route.params.title,
@@ -266,32 +264,40 @@ const CategoryDetailScreen = ({route}) => {
               </>
             }
 
-
-
-
-
-
-            {picture && (
+            {(picture && removebgStatus !== 'fulfilled') && (
               <View style={{marginTop:40,justifyContent:'center',alignItems:'center'}}>
             <ImageBackground
               style={{width:200,height:200}}
               imageStyle={{width:200,height:200, borderRadius:200}} source={{uri: picture.uri}}
               />
-              <Progressbar nowStep={nowStep} totalStep={totalStep} />
+              <Progressbar nowStep={nowStep} totalStep={totalStep} removebgStatus={removebgStatus} />
+
               <Pressable
                 onPress={removeBackgroundHandler}
-                style={{height:50,marginTop:24,borderWidth:1,borderColor:'#2d63e2',justifyContent:'center',alignItems:'center',paddingHorizontal:24}}
+                style={{height:50,minWidth:160,marginTop:24,borderWidth:1,borderColor:'#2d63e2',justifyContent:'center',alignItems:'center',paddingHorizontal:24}}
+                disabled={removebgStatus !== 'pending'}
               >
-                <Text style={{color:'#2d63e2'}}>배경 제거하기</Text>
+                
+                {removebgStatus === 'pending' && <Text style={{color:'#2d63e2'}}>배경 제거하기</Text>}
+                {removebgStatus === 'loading' && <ActivityIndicator color="#2d63e2" />}
+                
+              </Pressable>
+              </View>
+            )}
+            {(removebgPicture && removebgStatus === 'fulfilled') && (
+              <View style={{marginTop:40,justifyContent:'center',alignItems:'center'}}>
+              <ImageBackground
+                style={{width:200,height:200}}
+                imageStyle={{width:200,height:200, borderRadius:200}} source={{uri: removebgPicture.preview}}
+              />
+              <Pressable
+                onPress={() => {}}
+                style={{height:50,minWidth:160,marginTop:24,borderWidth:1,borderColor:'#2d63e2',justifyContent:'center',alignItems:'center',paddingHorizontal:24}} 
+              >
+                <Text style={{color:'#2d63e2'}}>편집된 사진 확인하러 가기</Text>
               </Pressable>
               </View>
             )} 
-
-
-
-
-
-
 
 
 
