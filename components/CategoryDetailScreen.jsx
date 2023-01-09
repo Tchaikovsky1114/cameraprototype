@@ -32,23 +32,27 @@ const CategoryDetailScreen = ({ route }) => {
   const navigation = useNavigation();
   const { width } = useWindowDimensions();
   const [button, setButtonState] = useRecoilState(buttonState);
-  const [keyring,setKeyring] = useRecoilState(keyringState);
+  const [keyring, setKeyring] = useRecoilState(keyringState);
   const [selectedUploadMethod, setSelectedUploadMethod] = useState('');
   const [selectedButtonType, setSelectedButtonType] = useState('');
   const [selectedSize, setSelectedSize] = useState();
   const [selectedCount, setSelectedCount] = useState();
-  const [isClickedChoiceProductCount, setIsClickedChoiceProductCount] = useState(false);
+  const [isClickedChoiceProductCount, setIsClickedChoiceProductCount] =
+    useState(false);
   const [selectedCoating, setSelectedCoating] = useState();
   const [isCoatingModalVisible, setisCoatingModalVisible] = useState(false);
   const [permissionStatus, setPermissionStatus] = useState(false);
   const [picture, setPicture] = useRecoilState(pictureState);
-  const [removebgPicture, setRemovebgPicture] = useRecoilState(removebgPictureState);
+  const [removebgPicture, setRemovebgPicture] =
+    useRecoilState(removebgPictureState);
   const [nowStep, setNowStep] = useState(0);
   const [totalStep, setTotalstep] = useState(0);
   const [removebgStatus, setRemovebgStatus] = useState('pending'); // pending,fulfilled,loading
-  const [mediaLibraryPermissionStatus, setMediaLibraryPermissionStatus] = ImagePicker.useMediaLibraryPermissions();
+  const [mediaLibraryPermissionStatus, setMediaLibraryPermissionStatus] =
+    ImagePicker.useMediaLibraryPermissions();
   const [webhardAddress, setWebhardAddress] = useState('');
-  const [isRegisterWebhardModalVisible, setIsRegisterWebhardModalVisible] = useState(false);
+  const [isRegisterWebhardModalVisible, setIsRegisterWebhardModalVisible] =
+    useState(false);
 
   const inputWebhardAddressHandler = useCallback((text) => {
     setWebhardAddress(text);
@@ -730,28 +734,49 @@ const CategoryDetailScreen = ({ route }) => {
               </Pressable>
             ))}
           </View>
-          {
-              choiceUploadMethod && (
-                <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={{marginTop:40}}
-                >
-                  {keyring.keyringType.map((item) => (
-                    
-                    <Pressable
-                      key={item.part_type}
-                      onPress={() => {}}
-                      style={{marginRight:8,justifyContent:'center',alignItems:'center'}}
-                      >
-                      <Image style={{width:96,height:96,borderRadius:16}} source={{uri: item.filename}} />
-                      <Text>{item.paper_name}</Text>
-                    </Pressable>
-                    
-                  ))}
-                </ScrollView>
-              )
-            }
+          {choiceUploadMethod && (
+            <>
+              <View
+                style={{
+                  marginVertical: 24,
+                  borderBottomWidth: 1,
+                  borderBottomColor: '#2d63e2',
+                  paddingBottom: 8,
+                }}
+              >
+                <Text>키링 유형 선택하기</Text>
+              </View>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {keyring.keyringType.map((item) => (
+                  <Pressable
+                    key={item.part_type}
+                    onPress={() => {}}
+                    style={{
+                      marginRight: 8,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Image
+                      style={{ width: 96, height: 96, borderRadius: 16 }}
+                      source={{ uri: item.filename }}
+                    />
+                    <Text>{item.paper_name}</Text>
+                  </Pressable>
+                ))}
+              </ScrollView>
+            </>
+          )}
+          <View
+                style={{
+                  marginVertical: 24,
+                  borderBottomWidth: 1,
+                  borderBottomColor: '#2d63e2',
+                  paddingBottom: 8,
+                }}
+              >
+                <Text>사이즈</Text>
+              </View>
         </View>
       </ScrollView>
     );

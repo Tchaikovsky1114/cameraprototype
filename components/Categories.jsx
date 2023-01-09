@@ -187,6 +187,10 @@ const Categories = () => {
       || item.rmat_code.includes('ACLP03GL0')
       || item.rmat_code.includes('ACL003TP0')
       )
+      const keyringSize = response.PAPERSIZE.filter((item) =>
+      item.size_type_code === 'CRP53'
+      || item.size_type_code === 'CRP54'
+      )
       const keyringType = response.krt_imgs
       const keyringQuantity = response.optionqty.filter((item) => item.cat_code ==='RP3300')
       const keyringBackface = ["반전","동일"]
@@ -198,6 +202,7 @@ const Categories = () => {
         keyringMaterial,
         keyringQuantity,
         keyringType,
+        keyringSize,
         keyringOrderCount: response.ordercount
       }
       setButton(gettingData)
