@@ -37,6 +37,12 @@
           "savePhotosPermission": "에드피아에서 사진을 저장하는 것을 허용해주세요",
           "isAccessMediaLocationEnabled": true
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "에드피아의 갤러리 접근을 허용해주세요."
+        }
       ]
     ]
   }

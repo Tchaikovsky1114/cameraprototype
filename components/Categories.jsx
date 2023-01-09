@@ -4,6 +4,7 @@ import Category from './Category'
 import { useRecoilState } from 'recoil'
 import { buttonState } from '../atom/button'
 import axios from 'axios'
+import { keyringState } from '../atom/keyring'
 
 
 
@@ -147,10 +148,12 @@ const DUMMY_CATEGORIES_DATA = {
 
 const Categories = () => {
   const [button,setButton] = useRecoilState(buttonState);
-
+  const [keyring,setKeyring] = useRecoilState(keyringState);
   const getAllProduct = async () => {
     try {
       const { data } = await axios.get('http://www.adpiamall.com/modules/api/estimate/print/init/options.php?category=RP3300&product=PRP033&goods_no=30');
+
+      console.log(data);
       return data;
     } catch (error) {
       console.log(error.response.data); 
@@ -177,7 +180,28 @@ const Categories = () => {
         orderCount: response.ordercount,  
         ink: response.ink[0],
       }
+      
+      const keyringMaterial = response.rmat.filter((item) =>
+      item.rmat_code.includes('ACLP03RG0')
+      || item.rmat_code.includes('ACLP03HG0')
+      || item.rmat_code.includes('ACLP03GL0')
+      || item.rmat_code.includes('ACL003TP0')
+      )
+      const keyringType = response.krt_imgs
+      const keyringQuantity = response.optionqty.filter((item) => item.cat_code ==='RP3300')
+      const keyringBackface = ["반전","동일"]
+      const keyringAccessories = response.PRINTING.filter((item) => item.h_code === "RNG");
+      
+      const keyringData = {
+        keyringAccessories,
+        keyringBackface,
+        keyringMaterial,
+        keyringQuantity,
+        keyringType,
+        keyringOrderCount: response.ordercount
+      }
       setButton(gettingData)
+      setKeyring(keyringData)
     });
   } ,[])
   

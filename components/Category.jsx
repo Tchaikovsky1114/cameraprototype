@@ -10,6 +10,7 @@ const Category = ({category}) => {
       title: category.category
     })
   }
+  
   return (
     <Pressable
     onPress={pressCategoryButtonHandler}
