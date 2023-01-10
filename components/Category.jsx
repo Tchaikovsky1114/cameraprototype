@@ -14,10 +14,10 @@ const Category = ({category}) => {
   return (
     <Pressable
     onPress={pressCategoryButtonHandler}
-      style={({pressed}) => [ styles.container,(category.category === '버튼'|| category.category === '키링') ? styles.button : null,{ opacity: pressed ? 0.78 : 1}]}
+      style={({pressed}) => [{backgroundColor:category.code},styles.container,(category.category === '버튼'|| category.category === '키링') ? styles.button : null,{ opacity: pressed ? 0.78 : 1}]}
       disabled={!(category.category === '버튼'|| category.category === '키링')}
     >
-      <Text style={[{color:"#77450c",fontWeight:'bold',fontSize:16},(category.category === '버튼' || category.category === '키링') ? styles.buttonText : null]}>{category.category}</Text>
+      <Text style={[{color:'#fff',fontWeight:'bold',fontSize:16,width:'100%'},(category.category === '버튼' || category.category === '키링') ? styles.buttonText : null]}>{category.category}</Text>
     </Pressable>
   )
 }
@@ -28,11 +28,12 @@ const styles = StyleSheet.create({
   container:{
     width:130,
     overflow: 'hidden',
-    backgroundColor:'#fff',
-    paddingVertical:24,
-    margin:24,
-    justifyContent:'center',
-    alignItems:'center',
+    paddingHorizontal:8,
+    height:100,
+    paddingVertical:8,
+    flex:1,
+    justifyContent:'flex-end',
+    alignItems:'flex-end',
     borderRadius:8,
     elevation:3,
     shadowColor:'#fff',

@@ -8,7 +8,7 @@ import { useRecoilState } from 'recoil';
 import { pictureState } from '../atom/picture';
 import { removebgPictureState } from '../atom/removebgPicture';
 import CameraPreview from './CameraPreview';
-import { ref, uploadBytes, uploadString } from 'firebase/storage';
+import { getDownloadURL, ref, uploadBytes, uploadString } from 'firebase/storage';
 import { storage } from '../firebaseConfig';
 import uuid from 'react-native-uuid';
 
@@ -50,16 +50,9 @@ const CameraScreen = ({ navigation,route }) => {
           setRemovebgPicture(null);
           setPicture(capturedImage);
         }).then(() => {
-          uploadImageAsync(capturedImage.uri)
+          uploadImageAsync(capturedImage.uri,'originalPhoto/')
         });
       }
-      // capturedImage.base64
-      
-      // const storageRef = ref(storage,`${uuid.v4()}`);
-      // uploadString(storageRef,capturedImage.base64,'base64')
-      // .then((snapshot) => {
-      //   console.log(snapshot);
-      // })
       navigation.navigate('CategoryDetail', {
         title: route.params.title,
       });
@@ -67,7 +60,7 @@ const CameraScreen = ({ navigation,route }) => {
       console.error(error);
     }
   };
-  async function uploadImageAsync(uri) { 
+  async function uploadImageAsync(uri,photoURL) { 
     const blob = await new Promise((resolve, reject) => { 
       const xhr = new XMLHttpRequest(); 
       xhr.onload = function () { 
@@ -81,10 +74,13 @@ const CameraScreen = ({ navigation,route }) => {
       xhr.open("GET", uri, true); 
       xhr.send(null);
     }); 
-    const storageRef = ref(storage,`${uuid.v4()}`);
+    const storageRef = ref(storage,`${photoURL}${uuid.v4()}`);
       uploadBytes(storageRef,blob)
-      .then((snapshot) => {
-        console.log(snapshot);
+      .then(async (snapshot) => {
+        // 추후 downloadURL을 fireStore에 유저 정보- 유저 사진 모음집에 저장
+        // 사진집을 만들 수 있게끔..?
+        const downloadURL = await getDownloadURL(storageRef);
+        console.log(downloadURL);
       }).catch((error) => console.log(error));
     blob.close()
  }
@@ -109,13 +105,14 @@ const CameraScreen = ({ navigation,route }) => {
         })
         if(!result.canceled){
           setPicture(result.assets[0]);
-          navigation.navigate('CategoryDetail', {
-            title: route.params.title,
-          });
+          return result.assets[0]
         }
-        console.log(result.assets);
+      }).then((response) => {
+        uploadImageAsync(response.uri,'editPhoto/');
+        navigation.navigate('CategoryDetail', {
+          title: route.params.title,
+        });
       });
-    
   }
   const toggleWhiteBalanceHandler = () => {
     if(toggleWhiteBalance > 4){

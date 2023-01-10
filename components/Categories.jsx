@@ -5,6 +5,7 @@ import { useRecoilState } from 'recoil'
 import { buttonState } from '../atom/button'
 import axios from 'axios'
 import { keyringState } from '../atom/keyring'
+import { FlatGrid } from 'react-native-super-grid'
 
 
 
@@ -14,134 +15,100 @@ const DUMMY_CATEGORIES_DATA = {
     {
       id:10011,
       category:"무드등",
-      product: ["Neon Heart", "Cherry Cherry", "망고튤립", "행운의 고래"]
+      product: ["Neon Heart", "Cherry Cherry", "망고튤립", "행운의 고래"],
+      code: '#1abc9c'
     },
     {
       id:10012,
       category:"액자",
-      product: ["원목액자", "초슬릭알루미늄액자","캔버스액자","프리미엄아크릴디아섹액자"]
+      product: ["원목액자", "초슬릭알루미늄액자","캔버스액자","프리미엄아크릴디아섹액자"],
+      code: '#2ecc71'
     },
   {
     id:20014,
     category:"버튼",
-    choiceDesign:["MyImage","WebHard"],
-    type:["PIN","MIRROR","MAGNET","OPENER"],
-    material: ["유포지 150g"],
-    sizeByType: {
-      PIN:[{width:32,height:32,isSizeEditPossible: false},{width:44,height:44,isSizeEditPossible: false}, {width:58,height:58,isSizeEditPossible: false}, {width:75,height:75,isSizeEditPossible: false}],
-      MIRROR:[{width:58,height:58,isSizeEditPossible: false}, {width:75,height:75,isSizeEditPossible: false}],
-      MAGNET:[{width:32,height:32,isSizeEditPossible: false}, {width:58,height:58,isSizeEditPossible: false}],
-      OPENER:[{width:58,height:58,isSizeEditPossible: false}]
-    },
-    imageByType: {
-      PIN: 'https://images.adpiamall.com/manual/sample_pop_h_05.jpg',
-      MIRROR: 'https://images.adpiamall.com/manual/sample_pop_h_06.jpg',
-      MAGNET: 'https://images.adpiamall.com/manual/sample_pop_h_07.jpg',
-      OPENER: 'https://images.adpiamall.com/manual/sample_pop_h_08.jpg'
-    },
-    ProcessingSize: {
-      width:12,
-      height:12
-    },
-    
-    minimumQuantity: 4,
-    ink: "수성잉크 4색",
-    packagingMaterial: "OPP접착봉투 (개별포장)",
-    options: ["코팅"],
-    detailOption: [
-    {
-      title:"코팅",
-      choice:["단면유광 핫코팅", "단면무광 핫코팅"]
-    }
-  ]
+    code: '#3498db',
   },
   {
     id:20015,
-    category:"마스킹테이프"
+    category:"마스킹테이프",
+    code: '#9b59b6'
   },
   {
     id:20016,
-    category:"하드폰케이스"
+    category:"하드폰케이스",
+    code: '#34495e'
   },
   {
     id:20017,
-    category:"투명폰케이스"
+    category:"투명폰케이스",
+    code: '#16a085'
   },
   {
     id:20018,
-    category:"에어팟케이스"
+    category:"에어팟케이스",
+    code: '#27ae60'
   },
   {
     id:20019,
-    category:"부채"
+    category:"부채",
+    code: '#2980b9'
   },
   {
     id:200110,
-    category:"아크릴판"
+    category:"아크릴판",
+    code: '#8e44ad',
+
   },
   {
     id:200111,
-    category:"무드등"
+    category:"무드등",
+    code: '#2c3e50'
   },
   {
     id:200112,
-    category:"가림막"
+    category:"가림막",
+    code: '#f1c40f'
   },
   {
     id:200113,
-    category:"톡"
+    category:"톡",
+    code: '#e67e22'
   },
   {
     id:200114,
     category:"키링",
-    choiceDesign:["MyImage","WebHard"],
-    type:["CIRCLE","SQUERE","HEART","FREEFORM"],
-    material: ["투명아크릴(두께 3mm)","펄골드 (두께 3mm)","펄 홀로그램 (두께 3mm)","펄 로즈골드 (두께 3mm)"],
-    sizeByType: {
-      CIRCLE:[{width:39,height:44,isSizeEditPossible: false}],
-      SQUERE:[{width:39,height:44,isSizeEditPossible: false}],
-      HEART:[{width:42,height:44,isSizeEditPossible: false}],
-      FREEFORM:[{width:50,height:60,isSizeEditPossible:true}]
-    },
-    // imageByType: {
-    //   CIRCLE:
-    //   SQUERE:
-    //   HEART:
-    //   FREEFORM:
-    // },
-    ProcessingSize: {width:2,height:2},
-    minimumQuantity: 1,
-    ink: "컬러+백색+컬러인쇄 (3layer)",
-    packagingMaterial: "OPP접착봉투 (개별포장)",
-    options: ["고리"],
-    detailOption: [{
-      title:"고리",
-      choice:["자물쇠 골드", "자물쇠 실버","볼체인 보라","볼체인 블랙","볼체인 화이트","볼체인 핑크","볼체인 블루", "볼체인 실버"]
-    }]
+    code: '#e74c3c'
   },
   {
     id:200115,
-    category:"명찰"
+    category:"명찰",
+    code: '#2d63e2'
   },
   {
     id:200116,
-    category:"비츠"
+    category:"비츠",
+    code: '#2ae4f1'
   },
   {
     id:200117,
-    category:"꽃병"
+    category:"꽃병",
+    code: '#f39c12'
   },
   {
     id:200118,
-    category:"트레이"
+    category:"트레이",
+    code: '#d4d2a2'
   },
   {
     id:200119,
-    category:"절곡"
+    category:"절곡",
+    code: '#c0392b'
   },
   {
     id:200120,
-    category:"다보액자"
+    category:"다보액자",
+    code: '#7f8c8d'
   }
 ]
 }
@@ -212,13 +179,21 @@ const Categories = () => {
   // console.log(keyring)
   
   return (
-    <FlatList
-    contentContainerStyle={[styles.container]}
+    <FlatGrid 
+    itemDimension={100}
     data={DUMMY_CATEGORIES_DATA.categories}
-    renderItem={({item}) => <Category key={item.id} category={{...item}} />}
-    numColumns={2}
-    showsVerticalScrollIndicator={false}
+    style={styles.container}
+    renderItem={({item}) => (<Category key={item.id} category={{...item}} />)}
+    spacing={10}
+    
     />
+    // <FlatList
+    // contentContainerStyle={[styles.container]}
+    // data={DUMMY_CATEGORIES_DATA.categories}
+    // renderItem={({item}) => (<Category key={item.id} category={{...item}} />)}
+    // numColumns={2}
+    // showsVerticalScrollIndicator={false}
+    // />
   )
 }
 
@@ -226,10 +201,9 @@ export default Categories
 
 const styles = StyleSheet.create({
   container:{
-    justifyContent:'center',
-    alignItems:'center',
-    borderWidth:2,
-    backgroundColor:'#77450c'
+    paddingTop:10,
+    backgroundColor:'#fff',
+    flex:1
   }
   
 })
