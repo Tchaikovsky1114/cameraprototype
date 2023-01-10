@@ -1,16 +1,4 @@
-import {
-  ActivityIndicator,
-  Alert,
-  Image,
-  ImageBackground,
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import {ActivityIndicator,Alert,Image,ImageBackground,Modal,Pressable,ScrollView,StyleSheet,Text,TouchableOpacity,useWindowDimensions,View} from 'react-native';
 import React, { useCallback, useLayoutEffect, useState } from 'react';
 
 import { buttonState } from '../atom/button';
@@ -25,6 +13,8 @@ import Progressbar from './Progressbar';
 import * as ImagePicker from 'expo-image-picker';
 import RegisterWebhardModal from './RegisterWebhardModal';
 import { keyringState } from '../atom/keyring';
+import KeyringQuantityModal from './KeyringQuantityModal';
+import KeyringAccessoriesModal from './KeyringAccessoriesModal';
 
 const choiceUploadMethod = ['마이 갤러리', '웹하드 등록', '카메라로 사진찍기'];
 
@@ -33,27 +23,55 @@ const CategoryDetailScreen = ({ route }) => {
   const { width } = useWindowDimensions();
   const [button, setButtonState] = useRecoilState(buttonState);
   const [keyring, setKeyring] = useRecoilState(keyringState);
+  const [removebgPicture, setRemovebgPicture] = useRecoilState(removebgPictureState);
+  const [picture, setPicture] = useRecoilState(pictureState);
   const [selectedUploadMethod, setSelectedUploadMethod] = useState('');
   const [selectedButtonType, setSelectedButtonType] = useState('');
   const [selectedSize, setSelectedSize] = useState();
   const [selectedCount, setSelectedCount] = useState();
-  const [isClickedChoiceProductCount, setIsClickedChoiceProductCount] =
-    useState(false);
   const [selectedCoating, setSelectedCoating] = useState();
-  const [isCoatingModalVisible, setisCoatingModalVisible] = useState(false);
   const [permissionStatus, setPermissionStatus] = useState(false);
-  const [picture, setPicture] = useRecoilState(pictureState);
-  const [removebgPicture, setRemovebgPicture] =
-    useRecoilState(removebgPictureState);
+  const [removebgStatus, setRemovebgStatus] = useState('pending'); // pending,fulfilled,loading
+  const [mediaLibraryPermissionStatus, setMediaLibraryPermissionStatus] = ImagePicker.useMediaLibraryPermissions();
+  const [keyringType,setKeyringType] = useState();
+  const [keyringQuantity,setKeyringQuantity] = useState();
   const [nowStep, setNowStep] = useState(0);
   const [totalStep, setTotalstep] = useState(0);
-  const [removebgStatus, setRemovebgStatus] = useState('pending'); // pending,fulfilled,loading
-  const [mediaLibraryPermissionStatus, setMediaLibraryPermissionStatus] =
-    ImagePicker.useMediaLibraryPermissions();
   const [webhardAddress, setWebhardAddress] = useState('');
-  const [isRegisterWebhardModalVisible, setIsRegisterWebhardModalVisible] =
-    useState(false);
+  const [keyringBackface,setKeyringBackface] = useState('');
+  const [keyringAccessory,setKeyringAccessory] = useState({title:'',imageURL:''});
+  const [isRegisterWebhardModalVisible, setIsRegisterWebhardModalVisible] = useState(false);
+  const [isClickedChoiceProductCount, setIsClickedChoiceProductCount] = useState(false);
+  const [isCoatingModalVisible, setisCoatingModalVisible] = useState(false);
+  const [isKeyringQuantityModalVisible,setIsKeyringQuantityModalVisible] = useState(false);
+  const [isKeyringAccessoriesModalVisible,setIsKeyringAccessoriesModalVisible] = useState(false);
 
+
+  const toggleKeyringAccessoriesModalHandler = () => {
+    setIsKeyringAccessoriesModalVisible(prev => !prev)
+  }
+
+  const selectKeyringAccessoryHandler = (title,image) => {
+    setIsKeyringAccessoriesModalVisible(false);
+    setKeyringAccessory(() => ({
+      title:title,
+      imageURL:image
+    }))
+  }
+
+  const selectKeyringQuantityHandler = (selectedquantity) => {
+    setKeyringQuantity(selectedquantity);
+    setIsKeyringQuantityModalVisible(false);
+  }
+  const toggleKeyringQuantityModalHandler = () => {
+    setIsKeyringQuantityModalVisible(prev => !prev)
+  }
+  const selectKeyringTypeHandler = (selectedType) => {
+    setKeyringType(selectedType);
+  }
+  const selectKeyringBackfaceHandler = (selectedBackface) => {
+    setKeyringBackface(selectedBackface);
+  }
   const inputWebhardAddressHandler = useCallback((text) => {
     setWebhardAddress(text);
     console.log(text);
@@ -66,13 +84,16 @@ const CategoryDetailScreen = ({ route }) => {
     setNowStep(0);
     setTotalstep(0);
   }, []);
+
   const openCameraHandler = async () => {
     initialzingInfomationAboutImage();
     try {
       const { status } = await Camera.requestCameraPermissionsAsync();
       if (status === 'granted') {
         setPermissionStatus(true);
-        navigation.navigate('CameraScreen');
+        navigation.navigate('CameraScreen',{
+          title: route.params.title
+        });
       } else {
         Alert.alert('카메라 접근 허용은 필수입니다.');
       }
@@ -108,6 +129,7 @@ const CategoryDetailScreen = ({ route }) => {
     setSelectedCoating(slectedItem);
   }, []);
   // console.log(keyring);
+  
   const pickGalleryImageHandler = async () => {
     initialzingInfomationAboutImage();
     if (!mediaLibraryPermissionStatus.granted) {
@@ -535,7 +557,6 @@ const CategoryDetailScreen = ({ route }) => {
                       totalStep={totalStep}
                       removebgStatus={removebgStatus}
                     />
-
                     <Pressable
                       onPress={removeBackgroundHandler}
                       style={{
@@ -690,6 +711,25 @@ const CategoryDetailScreen = ({ route }) => {
   }
   if (route.params.title === '키링' && keyring) {
     return (
+      <>
+      <KeyringQuantityModal
+        isVisible={isKeyringQuantityModalVisible}
+        keyring={keyring}
+        selectKeyringQuantityHandler={selectKeyringQuantityHandler}
+        toggleKeyringQuantityModalHandler={toggleKeyringQuantityModalHandler}
+      />
+      <KeyringAccessoriesModal
+        isVisible={isKeyringAccessoriesModalVisible}
+        keyring={keyring}
+        selectKeyringAccessoryHandler={selectKeyringAccessoryHandler}
+        toggleKeyringAccessoriesModalHandler={toggleKeyringAccessoriesModalHandler}
+      />
+      <RegisterWebhardModal
+        isRegisterWebhardModalHandler={isRegisterWebhardModalHandler}
+        isRegisterWebhardModalVisible={isRegisterWebhardModalVisible}
+        inputWebhardAddressHandler={inputWebhardAddressHandler}
+        webhardAddress={webhardAddress}
+      />
       <ScrollView style={styles.container}>
         <View
           style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
@@ -746,28 +786,65 @@ const CategoryDetailScreen = ({ route }) => {
               >
                 <Text>키링 유형 선택하기</Text>
               </View>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{paddingHorizontal:8}}
+                >
                 {keyring.keyringType.map((item) => (
                   <Pressable
                     key={item.part_type}
-                    onPress={() => {}}
-                    style={{
+                    onPress={() => selectKeyringTypeHandler(item.part_type)}
+                    style={() => [{
                       marginRight: 8,
                       justifyContent: 'center',
                       alignItems: 'center',
-                    }}
+                      borderRadius:16,
+                    }, keyringType === item.part_type ? styles.selectedTypeButton : null]}
                   >
                     <Image
                       style={{ width: 96, height: 96, borderRadius: 16 }}
                       source={{ uri: item.filename }}
                     />
-                    <Text>{item.paper_name}</Text>
+                    <Text style={keyringType === item.part_type ? {color:'#fff'} : null}>{item.paper_name}</Text>
                   </Pressable>
                 ))}
+               
               </ScrollView>
             </>
           )}
-          <View
+          { keyringType
+          && 
+        <View style={{justifyContent:'center',alignItems:'center',marginTop:24}}>
+
+          <View style={{justifyContent:'center',alignItems:'center'}}>    
+            <Text style={{borderBottomWidth:1,borderBottomColor:'#2d63e2'}}>재단 사이즈</Text>
+          {(keyringType === 'KRT01' || keyringType === 'KRT02')
+          && <Text>
+              {keyring.keyringSize[0].cut_norm_x_size} * {keyring.keyringSize[0].cut_norm_y_size}
+            </Text>}
+            {(keyringType === 'KRT03')
+          && <Text>
+              {keyring.keyringSize[1].cut_norm_x_size} * {keyring.keyringSize[1].cut_norm_y_size}
+            </Text>}
+          </View>
+          <View style={{justifyContent:'center',alignItems:'center'}}>
+          <Text style={{borderBottomWidth:1,borderBottomColor:'#2d63e2'}}>작업 사이즈</Text>
+          {(keyringType === 'KRT01' || keyringType === 'KRT02')
+          && <Text>{+keyring.keyringSize[0].cut_norm_x_size + 2} * {+keyring.keyringSize[0].cut_norm_y_size + 2}</Text>}
+          {(keyringType === 'KRT03')
+          && <Text>{+keyring.keyringSize[1].cut_norm_x_size + 2} * {+keyring.keyringSize[1].cut_norm_y_size + 2}</Text>}
+          </View>
+          <View style={{marginTop:8}}>
+            <Text style={{color:'#c9c9c9',fontSize:12}}>* 키링의 사이즈는 유형별로 고유하며 변경 불가합니다.</Text>
+            <Text style={{color:'#c9c9c9',fontSize:12}}>* 모든 사이즈는 밀리미터 단위입니다.</Text>
+          </View>
+        </View>
+          }
+          {
+            keyringType &&
+            <View style={{justifyContent:'center',alignItems:'center'}}>
+              <View
                 style={{
                   marginVertical: 24,
                   borderBottomWidth: 1,
@@ -775,10 +852,244 @@ const CategoryDetailScreen = ({ route }) => {
                   paddingBottom: 8,
                 }}
               >
-                <Text>사이즈</Text>
+                <Text>수량</Text>
               </View>
+              <View style={{flexDirection:'row'}}>
+                <TouchableOpacity 
+                onPress={toggleKeyringQuantityModalHandler}
+                style={{marginRight:8, paddingHorizontal:8,paddingVertical:4,borderWidth:1,borderColor:'#000',minWidth:96,justifyContent:'center',alignItems:'center'}}>
+                  <Text style={{color:'#000'}}>{keyringQuantity ? `${keyringQuantity}개`: '개수를 선택해주세요'}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                onPress={() => {return Alert.alert("서비스 준비중입니다.")}}
+                style={{ paddingHorizontal:8,paddingVertical:4,borderWidth:1,borderColor:'#000',minWidth:96,justifyContent:'center',alignItems:'center'}}>
+                  <Text style={{color:'#000'}}>종류를 선택해주세요</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          }
+          {
+            keyringQuantity &&
+            <View style={{justifyContent:'center',alignItems:'center'}}>
+              <View
+                style={{
+                  marginVertical: 24,
+                  borderBottomWidth: 1,
+                  borderBottomColor: '#2d63e2',
+                  paddingBottom: 8,
+                }}
+              >
+                <Text>후면방향</Text>
+              </View>
+              <View style={{flexDirection:'row'}}>
+              {keyring.keyringBackface.map((item) => (
+                <Pressable
+                key={item}
+                onPress={() => selectKeyringBackfaceHandler(item)}
+                style={[{paddingVertical:4,paddingHorizontal:16,height:40,justifyContent:'center',alignItems:'center'},keyringBackface === item ? {backgroundColor:'#2d63e2'} : {backgroundColor:'#fff'}]}>
+                  <Text style={keyringBackface === item ? {color:'#fff'} : {color:'#000'}}>{item}</Text>
+                </Pressable>
+              ))}
+              </View>
+            </View>
+          }
+          {
+            keyringBackface &&
+            <View style={{justifyContent:'center',alignItems:'center',marginVertical:24}}>
+              <View
+                style={{
+                  marginVertical: 24,
+                  borderBottomWidth: 1,
+                  borderBottomColor: '#2d63e2',
+                  paddingBottom: 8,
+                }}
+              >
+                <Text>고리</Text>
+              </View>
+              <TouchableOpacity
+              onPress={toggleKeyringAccessoriesModalHandler}
+              style={{height:56,minWidth:80,borderWidth:1,borderColor:'#ccc',justifyContent:'center',alignItems:'center',paddingHorizontal:8}}
+              >
+                {!keyringAccessory.title && <Text>고리를 선택해주세요</Text>}
+            {keyringAccessory.title && (
+              <View style={{paddingHorizontal:24,justifyContent:'flex-start',alignItems:'center',flexDirection:'row'}}>
+                <Image style={{width:48,height:48,borderRadius:48,marginRight:24}} source={{uri: keyringAccessory.imageURL }} />
+                <Text style={{fontSize:18,textAlign:'center'}}>{keyringAccessory.title}</Text>
+              </View>
+            )}
+              </TouchableOpacity>
+            </View>
+          }
+
+                {picture && removebgStatus !== 'fulfilled' && (
+                  <View
+                    style={{
+                      marginTop: 40,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <ImageBackground
+                      style={{ width: 200, height: 200 }}
+                      imageStyle={{
+                        width: 200,
+                        height: 200,
+                        borderRadius: 200,
+                      }}
+                      source={{ uri: picture.uri }}
+                    />
+                    <Progressbar
+                      nowStep={nowStep}
+                      totalStep={totalStep}
+                      removebgStatus={removebgStatus}
+                    />
+                    <Pressable
+                      onPress={removeBackgroundHandler}
+                      style={{
+                        height: 50,
+                        minWidth: 160,
+                        marginTop: 24,
+                        borderWidth: 1,
+                        borderColor: '#2d63e2',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        paddingHorizontal: 24,
+                      }}
+                      disabled={removebgStatus !== 'pending'}
+                    >
+                      {removebgStatus === 'pending' && (
+                        <Text style={{ color: '#2d63e2' }}>배경 제거하기</Text>
+                      )}
+                      {removebgStatus === 'loading' && (
+                        <ActivityIndicator color="#2d63e2" />
+                      )}
+                    </Pressable>
+                  </View>
+                )}
+                {removebgPicture && removebgStatus === 'fulfilled' && (
+                  <View
+                    style={{
+                      marginTop: 40,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <ImageBackground
+                      style={{ width: 200, height: 200 }}
+                      imageStyle={{
+                        width: 200,
+                        height: 200,
+                        borderRadius: 200,
+                      }}
+                      source={{ uri: removebgPicture.preview }}
+                    />
+                    <Pressable
+                      onPress={saveRemoveBgPictureHandler}
+                      style={{
+                        height: 50,
+                        minWidth: 160,
+                        marginTop: 24,
+                        borderWidth: 1,
+                        borderColor: '#2d63e2',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        paddingHorizontal: 24,
+                      }}
+                    >
+                      <Text style={{ color: '#2d63e2' }}>
+                        배경이 제거된 사진 저장
+                      </Text>
+                    </Pressable>
+                  </View>
+                )}
+
+                {selectedUploadMethod === '웹하드 등록' && webhardAddress && (
+                  <View
+                    style={{
+                      height: 48,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginTop: 24,
+                    }}
+                  >
+                    <Text style={{ fontSize: 18, fontWeight: '500' }}>
+                      등록한 웹하드 주소
+                    </Text>
+
+                    <View
+                      style={{
+                        paddingVertical: 8,
+                        borderBottomColor: '#2d63e2',
+                        borderBottomWidth: 1,
+                      }}
+                    >
+                      <Text style={{ fontSize: 18, fontWeight: '600' }}>
+                        {webhardAddress}
+                      </Text>
+                    </View>
+                  </View>
+                )}
+          {keyringAccessory.title && selectedUploadMethod === '마이 갤러리' && (
+                  <Pressable
+                    onPress={pickGalleryImageHandler}
+                    style={({ pressed }) => [
+                      {
+                        marginTop: 40,
+                        height: 60,
+                        width,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        backgroundColor: pressed ? '#6087e2' : '#2d63e2',
+                      },
+                    ]}
+                  >
+                    <Text style={{ color: '#fff', fontSize: 24 }}>
+                      사진 선택하러 가기
+                    </Text>
+                  </Pressable>
+                )}
+                {keyringAccessory.title && selectedUploadMethod === '웹하드 등록' && (
+                  <Pressable
+                    onPress={isRegisterWebhardModalHandler}
+                    style={({ pressed }) => [
+                      {
+                        marginTop: 40,
+                        height: 60,
+                        width,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        backgroundColor: pressed ? '#6087e2' : '#2d63e2',
+                      },
+                    ]}
+                  >
+                    <Text style={{ color: '#fff', fontSize: 24 }}>
+                      웹하드 등록
+                    </Text>
+                  </Pressable>
+                )}
+                {keyringAccessory.title &&
+                  selectedUploadMethod === '카메라로 사진찍기' && (
+                    <Pressable
+                      onPress={openCameraHandler}
+                      style={({ pressed }) => [
+                        {
+                          marginTop: 40,
+                          height: 60,
+                          width,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          backgroundColor: pressed ? '#6087e2' : '#2d63e2',
+                        },
+                      ]}
+                    >
+                      <Text style={{ color: '#fff', fontSize: 24 }}>
+                        카메라 켜기
+                      </Text>
+                    </Pressable>
+                  )}
         </View>
       </ScrollView>
+      </>
     );
   }
 };
@@ -820,4 +1131,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     width: 124,
   },
+  selectedTypeButton:{
+    backgroundColor:'#2d63e2'
+  }
 });

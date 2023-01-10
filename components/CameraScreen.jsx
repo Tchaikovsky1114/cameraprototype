@@ -10,7 +10,7 @@ import { removebgPictureState } from '../atom/removebgPicture';
 import CameraPreview from './CameraPreview';
 
 
-const CameraScreen = ({ navigation }) => {
+const CameraScreen = ({ navigation,route }) => {
   const cameraRef = useRef(null);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
@@ -49,7 +49,7 @@ const CameraScreen = ({ navigation }) => {
         });
       }
       navigation.navigate('CategoryDetail', {
-        title: '버튼',
+        title: route.params.title,
       });
     } catch (error) {
       console.error(error);
@@ -77,7 +77,7 @@ const CameraScreen = ({ navigation }) => {
         if(!result.canceled){
           setPicture(result.assets[0]);
           navigation.navigate('CategoryDetail', {
-            title: '버튼',
+            title: route.params.title,
           });
         }
         console.log(result.assets);

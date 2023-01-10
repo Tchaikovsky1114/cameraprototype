@@ -209,7 +209,7 @@ const Categories = () => {
       setKeyring(keyringData)
     });
   } ,[])
-  
+  // console.log(keyring)
   
   return (
     <FlatList
