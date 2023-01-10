@@ -8,7 +8,9 @@ import { useRecoilState } from 'recoil';
 import { pictureState } from '../atom/picture';
 import { removebgPictureState } from '../atom/removebgPicture';
 import CameraPreview from './CameraPreview';
-
+import { ref, uploadBytes, uploadString } from 'firebase/storage';
+import { storage } from '../firebaseConfig';
+import uuid from 'react-native-uuid';
 
 const CameraScreen = ({ navigation,route }) => {
   const cameraRef = useRef(null);
@@ -21,6 +23,7 @@ const CameraScreen = ({ navigation,route }) => {
   const [removebgPicture, setRemovebgPicture] = useRecoilState(removebgPictureState);
   const [zoomLevel,setZoomLevel] = useState(0);
   const [toggleWhiteBalance,setToggleWhiteBalance] = useState(0)
+
   const takePictureHandler = async () => { 
     if (!cameraRef.current) return;
     await cameraRef.current
@@ -46,8 +49,17 @@ const CameraScreen = ({ navigation,route }) => {
         await MediaLibrary.saveToLibraryAsync(capturedImage.uri).then(() => {
           setRemovebgPicture(null);
           setPicture(capturedImage);
+        }).then(() => {
+          uploadImageAsync(capturedImage.uri)
         });
       }
+      // capturedImage.base64
+      
+      // const storageRef = ref(storage,`${uuid.v4()}`);
+      // uploadString(storageRef,capturedImage.base64,'base64')
+      // .then((snapshot) => {
+      //   console.log(snapshot);
+      // })
       navigation.navigate('CategoryDetail', {
         title: route.params.title,
       });
@@ -55,7 +67,28 @@ const CameraScreen = ({ navigation,route }) => {
       console.error(error);
     }
   };
-
+  async function uploadImageAsync(uri) { 
+    const blob = await new Promise((resolve, reject) => { 
+      const xhr = new XMLHttpRequest(); 
+      xhr.onload = function () { 
+        resolve(xhr.response); 
+      }; 
+      xhr.onerror = function (e) { 
+        console.log(e); 
+      reject(new TypeError("네트워크 요청 실패")); 
+      }; 
+      xhr.responseType = "blob"; 
+      xhr.open("GET", uri, true); 
+      xhr.send(null);
+    }); 
+    const storageRef = ref(storage,`${uuid.v4()}`);
+      uploadBytes(storageRef,blob)
+      .then((snapshot) => {
+        console.log(snapshot);
+      }).catch((error) => console.log(error));
+    blob.close()
+ }
+  
   const editPictureHandler = async () => {
     const { status } = await MediaLibrary.requestPermissionsAsync();
     if(status !== 'granted') {
