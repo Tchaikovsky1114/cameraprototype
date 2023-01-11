@@ -774,7 +774,7 @@ const CategoryDetailScreen = ({ route }) => {
               </Pressable>
             ))}
           </View>
-          {choiceUploadMethod && (
+          {selectedUploadMethod && (
             <>
               <View
                 style={{

@@ -36,7 +36,6 @@ const CameraScreen = ({ navigation,route }) => {
       });
   };
 
-
   const retakePictureHandler = () => {
     setPreviewVisible(false);
     setCapturedImage(null);
@@ -211,8 +210,6 @@ const CameraScreen = ({ navigation,route }) => {
             <Text style={{ color: '#fff' }}>밸런스 필터링</Text>
           </TouchableOpacity>
         </View>
-        
-        
         
         <View
           style={{

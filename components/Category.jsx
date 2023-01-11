@@ -1,11 +1,14 @@
 import { Pressable, StyleSheet, Text } from 'react-native'
 import React from 'react'
 import { useNavigation } from '@react-navigation/native';
+import { useRecoilState } from 'recoil';
+import { pictureState } from '../atom/picture';
 
 const Category = ({category}) => {
-
+  const [picture,setPicture] = useRecoilState(pictureState);
   const navigation = useNavigation();
   const pressCategoryButtonHandler = () => {
+    setPicture(null);
     navigation.navigate('CategoryDetail',{
       title: category.category
     })
@@ -29,15 +32,15 @@ const styles = StyleSheet.create({
     width:130,
     overflow: 'hidden',
     paddingHorizontal:8,
-    height:100,
+    height:130,
     paddingVertical:8,
     flex:1,
     justifyContent:'flex-end',
     alignItems:'flex-end',
-    borderRadius:8,
-    elevation:3,
-    shadowColor:'#fff',
-    shadowOpacity:1,
+    borderRadius:3,
+    elevation:4,
+    shadowColor:'#ccc',
+    shadowOpacity:0.78,
     shadowRadius:8,
     shadowOffset:{
       width:0,

@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet } from 'react-native'
+import { FlatList, StyleSheet, useWindowDimensions } from 'react-native'
 import React, { useEffect } from 'react'
 import Category from './Category'
 import { useRecoilState } from 'recoil'
@@ -62,7 +62,7 @@ const DUMMY_CATEGORIES_DATA = {
   },
   {
     id:200111,
-    category:"무드등",
+    category:"커스텀무드등",
     code: '#2c3e50'
   },
   {
@@ -116,6 +116,7 @@ const DUMMY_CATEGORIES_DATA = {
 const Categories = () => {
   const [button,setButton] = useRecoilState(buttonState);
   const [keyring,setKeyring] = useRecoilState(keyringState);
+  const { width, height } = useWindowDimensions();
   const getAllProduct = async () => {
     try {
       const { data } = await axios.get('http://www.adpiamall.com/modules/api/estimate/print/init/options.php?category=RP3300&product=PRP033&goods_no=30');
@@ -177,14 +178,14 @@ const Categories = () => {
     });
   } ,[])
   // console.log(keyring)
-  
+  console.log(width); 
   return (
     <FlatGrid 
     itemDimension={100}
     data={DUMMY_CATEGORIES_DATA.categories}
     style={styles.container}
     renderItem={({item}) => (<Category key={item.id} category={{...item}} />)}
-    spacing={10}
+    spacing={width < 400 ? 20 : 30}
     
     />
     // <FlatList
