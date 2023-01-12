@@ -6,6 +6,7 @@ import { buttonState } from '../atom/button'
 import axios from 'axios'
 import { keyringState } from '../atom/keyring'
 import { FlatGrid } from 'react-native-super-grid'
+import useCalculateDimensions from '../hooks/useCalculateDimensions'
 
 
 
@@ -116,7 +117,14 @@ const DUMMY_CATEGORIES_DATA = {
 const Categories = () => {
   const [button,setButton] = useRecoilState(buttonState);
   const [keyring,setKeyring] = useRecoilState(keyringState);
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
+  const { deviceWidth } = useCalculateDimensions({
+    fixedWidth:30,
+    minWidth:400,
+    calculatedWidth:20
+    // width < 400 ? 20 : 30
+    });
+  
   const getAllProduct = async () => {
     try {
       const { data } = await axios.get('http://www.adpiamall.com/modules/api/estimate/print/init/options.php?category=RP3300&product=PRP033&goods_no=30');
@@ -177,8 +185,7 @@ const Categories = () => {
       setKeyring(keyringData)
     });
   } ,[])
-  // console.log(keyring)
-  console.log(width); 
+  
   return (
     <FlatGrid 
     itemDimension={100}
@@ -186,15 +193,7 @@ const Categories = () => {
     style={styles.container}
     renderItem={({item}) => (<Category key={item.id} category={{...item}} />)}
     spacing={width < 400 ? 20 : 30}
-    
     />
-    // <FlatList
-    // contentContainerStyle={[styles.container]}
-    // data={DUMMY_CATEGORIES_DATA.categories}
-    // renderItem={({item}) => (<Category key={item.id} category={{...item}} />)}
-    // numColumns={2}
-    // showsVerticalScrollIndicator={false}
-    // />
   )
 }
 

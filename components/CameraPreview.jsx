@@ -1,12 +1,16 @@
 import { Button, ImageBackground, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native'
 import React from 'react'
+import useCalculateDimensions from '../hooks/useCalculateDimensions';
 
 const CameraPreview = ({photo,retakePictureHandler,savePictureHandler,editPictureHandler}) => {
   const {width} = useWindowDimensions();
-  
-  
-  const deviceWidth = width < 330 ? width : 390;
-  const deviceHeight = width < 300 ? (width / 3) * 4 : 520
+  const { deviceHeight,deviceWidth } = useCalculateDimensions({
+    fixedHeight:520,
+    fixedWidth:390,
+    minHeight: 330,
+    minWidth: 330
+  })
+  console.log(deviceHeight,deviceWidth);
 
   return (
     <View style={{backgroundColor:'#fff',flex:1,alignItems:'center',position:'relative'}}>

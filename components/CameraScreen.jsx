@@ -1,5 +1,5 @@
 import { StyleSheet,Text,TouchableOpacity,useWindowDimensions,View } from 'react-native';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -11,13 +11,17 @@ import CameraPreview from './CameraPreview';
 import { getDownloadURL, ref, uploadBytes, uploadString } from 'firebase/storage';
 import { storage } from '../firebaseConfig';
 import uuid from 'react-native-uuid';
+import useCalculateDimensions from '../hooks/useCalculateDimensions';
+
 
 const CameraScreen = ({ navigation,route }) => {
   const cameraRef = useRef(null);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
-  const { width } = useWindowDimensions();
-  // const height = Math.round((width * 16) / 9);
+  const { deviceWidth } = useCalculateDimensions({
+    fixedWidth:3080,
+    minWidth:3080,
+  });
   const [cameraType, setCameraType] = useState(CameraType.back);
   const [picture, setPicture] = useRecoilState(pictureState);
   const [removebgPicture, setRemovebgPicture] = useRecoilState(removebgPictureState);
@@ -36,10 +40,10 @@ const CameraScreen = ({ navigation,route }) => {
       });
   };
 
-  const retakePictureHandler = () => {
+  const retakePictureHandler = useCallback(() => {
     setPreviewVisible(false);
     setCapturedImage(null);
-  };
+  },[]);
 
   const savePictureHandler = async () => {
     try {
@@ -158,9 +162,9 @@ const CameraScreen = ({ navigation,route }) => {
             position:'absolute',
             justifyContent: 'center',
             alignItems: 'center',
-            width,
+            width:deviceWidth,
             bottom:-32,
-            zIndex:9999
+            zIndex:10
           }}
         >
         <TouchableOpacity
@@ -181,7 +185,7 @@ const CameraScreen = ({ navigation,route }) => {
         </View>
       <View style={{borderRadius:32,overflow:'hidden'}}>
       <Camera
-        style={{width,borderRadius:32,height:'100%' }}
+        style={{width:deviceWidth,borderRadius:32,height:'100%' }}
         ref={cameraRef}
         type={cameraType}
         zoom={zoomLevel}
@@ -193,7 +197,7 @@ const CameraScreen = ({ navigation,route }) => {
           style={{
             justifyContent: 'flex-start',
             alignItems: 'flex-start',
-            width,
+            width:deviceWidth,
             marginTop: 40,
           }}
         >
@@ -215,7 +219,7 @@ const CameraScreen = ({ navigation,route }) => {
           style={{
             justifyContent: 'flex-start',
             alignItems: 'flex-end',
-            width,
+            width:deviceWidth,
           }}
         >
           <TouchableOpacity
